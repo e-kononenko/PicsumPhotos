@@ -29,9 +29,7 @@ struct PhotoListFeature {
     }
 
     var body: some Reducer<State, Action> {
-        Reduce {
-            state,
-            action in
+        Reduce { state, action in
             switch action {
             case .didAppear:
                 state.isLoading = true
