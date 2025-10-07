@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct PicsumPhotosApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PhotoListView(store: Store(initialState: PhotoListFeature.State(), reducer: {
+                PhotoListFeature()
+            }))
         }
     }
 }
