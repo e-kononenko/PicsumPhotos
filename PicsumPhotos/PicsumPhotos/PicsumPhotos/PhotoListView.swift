@@ -20,7 +20,7 @@ struct PhotoListView: View {
 
                     } label: {
                         HStack {
-                            KFImage(photo.url)
+                            KFImage(photo.imageURL)
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 44, height: 44, alignment: .center)
@@ -51,3 +51,4 @@ struct PhotoListView: View {
         PhotoListFeature()
     }))
 }
+

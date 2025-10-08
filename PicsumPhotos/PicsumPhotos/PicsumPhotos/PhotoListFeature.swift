@@ -13,13 +13,19 @@ struct Photo: Identifiable, Equatable {
     let url: URL?
 }
 
+struct PhotoDisplayModel: Identifiable, Equatable {
+    let id: String
+    let author: String
+    let imageURL: URL?
+}
+
 @Reducer
 struct PhotoListFeature {
     @Dependency(\.photoClient) var photoClient
 
     @ObservableState
     struct State: Equatable {
-        var photos: [Photo] = []
+        var photos: [PhotoDisplayModel] = []
         var isLoading: Bool = false
         var errorText: String?
     }
@@ -59,17 +65,24 @@ struct PhotoListFeature {
 //                            ]
 //                        )
 //                    )
+
                 } catch: { error, send in
-                    return await send(.fetchPhotosFailure(error))                    
+                    return await send(.fetchPhotosFailure(error))
                 }
             case .fetchPhotosSuccess(let photos):
                 state.isLoading = false
-                state.photos = photos
+
+                let displayModels = photos.map { PhotoDisplayModel(id: $0.id, author: $0.author, imageURL: $0.url) }
+
+                state.photos = displayModels
+
                 return .none
             case .fetchPhotosFailure(let error):
                 state.isLoading = false
+                state.errorText = "Failed to fetch photos: \(error)"
                 return .none
             }
         }
     }
 }
+
