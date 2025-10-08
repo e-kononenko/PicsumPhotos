@@ -24,3 +24,9 @@ struct PicsumPhoto: Decodable {
         case downloadURL = "download_url"
     }
 }
+
+extension PicsumPhoto {
+    var toPhoto: Photo {
+        return Photo(id: id, author: author, url: downloadURL)
+    }
+}
