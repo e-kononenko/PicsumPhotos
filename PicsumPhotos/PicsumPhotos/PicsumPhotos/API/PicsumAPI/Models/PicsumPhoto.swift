@@ -10,8 +10,8 @@ import Foundation
 struct PicsumPhoto: Decodable {
     let id: String
     let author: String
-    let width: Int
-    let height: Int
+    let width: Double
+    let height: Double
     let url: URL
     let downloadURL: URL
 
@@ -27,6 +27,6 @@ struct PicsumPhoto: Decodable {
 
 extension PicsumPhoto {
     var toPhoto: Photo {
-        return Photo(id: id, author: author, url: downloadURL)
+        return Photo(id: id, author: author, url: downloadURL, width: width, height: height)
     }
 }
