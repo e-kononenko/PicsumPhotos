@@ -101,7 +101,6 @@ struct PhotoListFeature {
                 return .none
 
             case .details:
-                // do nothing, the child view shares the state and handles its own work
                 return .none
             }
         }
