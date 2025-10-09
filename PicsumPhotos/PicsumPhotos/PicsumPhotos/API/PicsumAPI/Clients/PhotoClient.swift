@@ -9,17 +9,22 @@ import ComposableArchitecture
 
 struct PhotoClient {
     var getPhotos: () async throws -> [Photo]
+    var getPhotoDetails: (String) async throws -> PhotoDetails
 }
 
 
 // MARK: - Live API implementation
 extension PhotoClient: DependencyKey {
     static var liveValue: PhotoClient {
-        return PhotoClient {
+        return .init {
             let request = PicsumPhotosRequest()
             let apiPhotos = try await APIClient.fetch(request: request)
             let photos = apiPhotos.map(\.toPhoto)
             return photos
+        } getPhotoDetails: { photoId in
+            let request = PicsumPhotosDetailsRequest(photoId: photoId)
+            let apiPhotoDetails = try await APIClient.fetch(request: request)
+            return apiPhotoDetails.toPhotoDetails
         }
     }
 

@@ -63,7 +63,6 @@ struct PhotoListFeature {
 
         var isLoading: Bool = false
         var errorText: String?
-
     }
 
     enum Action {

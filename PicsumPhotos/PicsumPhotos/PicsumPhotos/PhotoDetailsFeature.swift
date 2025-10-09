@@ -28,19 +28,32 @@ struct PhotoDetailsFeature {
     enum Action {
         case didAppear
         case toggleFavorite
+        case fetchPhotoDetailsSuccess(PhotoDetails)
+        case fetchPhotoDetailsFailure(Error)
     }
+
+    @Dependency(\.photoClient) var photoClient
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .didAppear:
-                state.$favorites.withLock {
-                    _ = $0.insert("2")
-
-                    _ = $0.insert("6")
+                return .run { [photoId = state.photoId] send in
+                    let photoDetails = try await photoClient
+                        .getPhotoDetails(photoId)
+                    await send(.fetchPhotoDetailsSuccess(photoDetails))
+                } catch: { error, send in
+                    await send(.fetchPhotoDetailsFailure(error))
                 }
-                return .none
             case .toggleFavorite:
+                
+                return .none
+
+            case .fetchPhotoDetailsSuccess(let photoDetails):
+                state.photoDetails = photoDetails
+                return .none
+
+            case .fetchPhotoDetailsFailure(let error):
                 return .none
             }
         }
