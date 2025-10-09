@@ -45,35 +45,34 @@ struct PhotoListFeature {
 
     @ObservableState
     struct State: Equatable {
-        var photos: [Photo] = [] {
-            didSet {
-                let displayModels = photos.map {
-                    PhotoDisplayModel(photo: $0, isFavorite: false)
-                }
+        @Presents var photoDetails: PhotoDetailsFeature.State?
 
-                let grouped = Dictionary(grouping: displayModels, by: { $0.author })
+        var photos: [Photo] = []
 
-                self.sections = grouped
-                    .map { key, value in
-                        AuthorSection(
-                            author: key,
-                            photos: value
-                        )
-                    }
-                    .sorted { lhs, rhs in
-                        lhs.author.localizedCaseInsensitiveCompare(rhs.author) == .orderedAscending
-                    }
+        var sections: [AuthorSection] {
+            let displayModels = photos.map {
+                PhotoDisplayModel(photo: $0, isFavorite: self.favorites.contains($0.id))
             }
+            let grouped = Dictionary(grouping: displayModels, by: { $0.author })
+            return grouped
+                .map { AuthorSection(author: $0.key, photos: $0.value) }
+                .sorted { $0.author.localizedCaseInsensitiveCompare($1.author) == .orderedAscending }
         }
+
+        @Shared(.inMemory("favorites")) var favorites: Set<String> = .init(["0", "1"])
+
         var isLoading: Bool = false
         var errorText: String?
-        var sections: [AuthorSection] = []
+
     }
 
     enum Action {
         case didAppear
         case fetchPhotosSuccess([Photo])
         case fetchPhotosFailure(Error)
+
+        case rowTapped(photoId: String)
+        case details(PresentationAction<PhotoDetailsFeature.Action>)
     }
 
     var body: some Reducer<State, Action> {
@@ -97,7 +96,18 @@ struct PhotoListFeature {
                 state.isLoading = false
                 state.errorText = "Failed to fetch photos: \(error)"
                 return .none
+
+            case .rowTapped(let photoId):
+                state.photoDetails = .init(photoId: photoId)
+                return .none
+
+            case .details:
+                // do nothing, the child view shares the state and handles its own work
+                return .none
             }
+        }
+        .ifLet(\.$photoDetails, action: \.details) {
+            PhotoDetailsFeature()
         }
     }
 }

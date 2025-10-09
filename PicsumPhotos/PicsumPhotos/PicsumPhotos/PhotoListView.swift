@@ -11,7 +11,7 @@ import Kingfisher
 
 struct PhotoListView: View {
     let store: StoreOf<PhotoListFeature>
-
+    
     var body: some View {
         NavigationStack {
             List {
@@ -19,7 +19,7 @@ struct PhotoListView: View {
                     Section(header: Text(section.author)) {
                         ForEach(section.photos) { photo in
                             Button {
-
+                                store.send(.rowTapped(photoId: photo.id))
                             } label: {
                                 PhotoRowView(photo: photo)
                             }
@@ -50,12 +50,18 @@ struct PhotoListView: View {
         .onAppear {
             store.send(.didAppear)
         }
+        
+        .sheet(
+            store: store.scope(state: \.$photoDetails, action: \.details)
+        ) { detailStore in
+            PhotoDetailsView(store: detailStore)
+        }
     }
 }
 
 struct PhotoRowView: View {
     let photo: PhotoDisplayModel
-
+    
     var body: some View {
         HStack {
             KFImage(photo.imageURL)
@@ -72,12 +78,12 @@ struct PhotoRowView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 44, height: 44, alignment: .center)
                 .clipped()
-
+            
             Text(photo.author)
                 .font(.headline)
                 .foregroundStyle(.primary)
             Spacer()
-            Image(systemName: "heart")
+            Image(systemName: photo.isFavorite ? "heart.fill" : "heart")
                 .renderingMode(.original)
                 .foregroundStyle(.primary)
         }
