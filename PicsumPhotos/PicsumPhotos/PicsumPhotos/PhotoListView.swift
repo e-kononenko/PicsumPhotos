@@ -11,7 +11,7 @@ import Kingfisher
 
 struct PhotoListView: View {
     let store: StoreOf<PhotoListFeature>
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -36,7 +36,7 @@ struct PhotoListView: View {
             }
             .overlay(alignment: .center) {
                 if store.isLoading && store.state.sections.isEmpty {
-                    ProgressView("Loading…")
+                    ProgressView()
                         .controlSize(.large)
                         .padding(20)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
@@ -50,7 +50,6 @@ struct PhotoListView: View {
         .onAppear {
             store.send(.didAppear)
         }
-        
         .sheet(
             store: store.scope(state: \.$photoDetails, action: \.details)
         ) { detailStore in
@@ -61,13 +60,14 @@ struct PhotoListView: View {
 
 struct PhotoRowView: View {
     let photo: PhotoDisplayModel
-    
+
     var body: some View {
         HStack {
             KFImage(photo.imageURL)
-                .placeholder { p in
-                    ProgressView(p)
+                .placeholder { _ in
+                    ProgressView()
                 }
+            // for the sake of performance, since API doesn't provide thumbnail images
                 .downsampling(
                     size: CGSize(
                         width: photo.width / 100.0,
@@ -78,7 +78,7 @@ struct PhotoRowView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 44, height: 44, alignment: .center)
                 .clipped()
-            
+
             Text(photo.author)
                 .font(.headline)
                 .foregroundStyle(.primary)

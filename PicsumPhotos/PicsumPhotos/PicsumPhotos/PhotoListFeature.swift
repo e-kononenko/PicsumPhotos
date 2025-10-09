@@ -59,7 +59,7 @@ struct PhotoListFeature {
                 .sorted { $0.author.localizedCaseInsensitiveCompare($1.author) == .orderedAscending }
         }
 
-        @Shared(.inMemory("favorites")) var favorites: Set<String> = .init(["0", "1"])
+        @Shared(.inMemory("favorites")) var favorites: Set<String> = .init()
 
         var isLoading: Bool = false
         var errorText: String?
