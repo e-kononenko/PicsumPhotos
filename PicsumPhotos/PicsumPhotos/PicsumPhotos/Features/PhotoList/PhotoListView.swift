@@ -70,8 +70,8 @@ struct PhotoRowView: View {
             // for the sake of performance, since API doesn't provide thumbnail images
                 .downsampling(
                     size: CGSize(
-                        width: photo.width / 100.0,
-                        height: photo.height / 100.0
+                        width: photo.width / 50.0,
+                        height: photo.height / 50.0
                     )
                 )
                 .resizable()
